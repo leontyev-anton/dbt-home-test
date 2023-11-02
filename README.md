@@ -12,12 +12,12 @@ dbt run  # generate the models
 dbt test # test the models ('dbt_oaknorth/seeds/properties.yml' and 'test/transactions.sql')
 ```
 ## Model 1
-dbt_oaknorth/models/mart__customers.sql:
+[/dbt_oaknorth/models/mart__customers.sql](/dbt_oaknorth/models/mart__customers.sql)
 
 Model that consolidates relevant customer information with their transactions:
-- amount_total: total transactions made by each customer
-- amount_average_month: their average monthly spending (number of months between first and last transaction; maybe this is a topic for discussion.)
-- spending_interval_avg: the average customer spending interval, representing the average number of days it takes for the customer to perform a transaction
+- <ins>amount_total</ins>: total transactions made by each customer
+- <ins>amount_average_month</ins>: their average monthly spending (number of months between first and last transaction; maybe this is a topic for discussion.)
+- <ins>spending_interval_avg</ins>: the average customer spending interval, representing the average number of days it takes for the customer to perform a transaction
 
 | customer_id| customer_name| customer_joined_date| amount_total| amount_average_month| months_payed| months_between_first_last_transaction| spending_interval_avg |
 | --- | --- |  --- |  --- |  --- |  --- |  --- |  --- |
@@ -42,8 +42,8 @@ Model that consolidates relevant customer information with their transactions:
 dbt_oaknorth/models/mart__last_12_months.sql:
 
 Model that calculates the total transaction amount for each month over the last 12 months
-- percent_change_amount: the percentage change in transaction totals from one month to the next
-- top_customer_id: calculate the top customer for each month by selecting the customer with the highest spending
+- <ins>percent_change_amount</ins>: the percentage change in transaction totals from one month to the next
+- <ins>top_customer_id</ins>: calculate the top customer for each month by selecting the customer with the highest spending
 
 | month | amount | amount_previous_month | percent_change_amount | top_customer_id | top_customer_name | top_customer_joined_date | top_customer_amount | 
 | --- | --- |  --- |  --- |  --- |  --- |  --- |  --- |
