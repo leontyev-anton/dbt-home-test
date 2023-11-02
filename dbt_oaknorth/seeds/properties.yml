@@ -1,0 +1,47 @@
+seeds:
+  - name: transactions
+    config:
+      column_types:
+        transaction_id: INTEGER
+        customer_id: STRING
+        transaction_date: STRING
+        amount: DECIMAL
+
+    columns:
+      - name: transaction_id 
+        tests:
+          - unique
+          - not_null:          
+              config:
+                severity: warn
+      - name: customer_id 
+        tests:
+          - not_null:
+              config:
+                severity: warn
+          - relationships:
+              to: ref('customers')
+              field: customer_id               
+              config:
+                severity: warn
+
+  - name: customers
+    config:
+      column_types:
+        customer_id: STRING
+        name: STRING
+        date_of_birth: STRING
+        joined_date: STRING
+        
+    columns:
+      - name: customer_id 
+        tests:
+          - not_null:
+              config:
+                severity: warn
+          - unique
+      - name: joined_date 
+        tests:
+          - not_null:
+              config:
+                severity: warn
