@@ -23,16 +23,18 @@ WITH transactions_add_spending_interval AS
          customer_id, transaction_month, transaction_date, amount, name AS customer_name, joined_date AS customer_joined_date, 
          LAG(transaction_date) OVER (PARTITION BY customer_id ORDER BY transaction_date, transaction_id DESC) AS transaction_date_previous,
 
-      FROM {{ ref('int__transactions')  }}
+      FROM {{ ref('int__transactions')  
+      WHERE error_text IS NULL
    )
 )
 
 
 
+
+
 SELECT
-   customer_id, customer_name, customer_joined_date,
-   amount AS amount_total,
-   ROUND(amount / months_between_first_last_transaction,2) AS amount_average_month,
+   customer_id, customer_name, customer_joined_date, amount_total,
+   ROUND(amount_total / months_between_first_last_transaction,2) AS amount_average_month,
    months_payed,
    months_between_first_last_transaction,
    spending_interval_avg,
@@ -41,31 +43,16 @@ FROM
 (
    SELECT
       customer_id, customer_name, customer_joined_date,
-      MIN(transaction_month) AS month_first_transaction, 
-      MAX(transaction_month) AS month_last_transaction, 
-      COUNT(transaction_month) AS months_payed,
+      SUM(amount) AS amount_total,
+      COUNT(DISTINCT transaction_month) AS months_payed,
       DATE_DIFF( 
-         DATE(CONCAT(MAX(transaction_month),'-01')),
-         DATE(CONCAT(MIN(transaction_month),'-01')),
+         DATE_TRUNC(MAX(transaction_date), MONTH),
+         DATE_TRUNC(MIN(transaction_date), MONTH),
          MONTH
       ) +1 AS months_between_first_last_transaction,
-      SUM(amount) AS amount,
-      -- SUM(spending_interval_sum) AS spending_interval_sum,
-      -- SUM(spending_interval_count) AS spending_interval_count,
-      ROUND( SUM(spending_interval_sum) / SUM(spending_interval_count), 2) AS spending_interval_avg,
+      ROUND(AVG(spending_interval),2) AS spending_interval_avg,
 
-   FROM
-   (
-      SELECT 
-         customer_id, transaction_month, customer_name, customer_joined_date, 
-         SUM(amount) AS amount,
-         SUM(spending_interval) AS spending_interval_sum,
-         COUNT(spending_interval) AS spending_interval_count,
-
-      FROM transactions_add_spending_interval
-      GROUP BY customer_id, transaction_month, customer_name, customer_joined_date
-   )
+   FROM transactions_add_spending_interval
    GROUP BY customer_id, customer_name, customer_joined_date
-   ORDER BY customer_id
 )
 ORDER BY customer_id

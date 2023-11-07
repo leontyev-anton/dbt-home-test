@@ -49,6 +49,7 @@ FROM
    (
       SELECT transaction_month, SUM(amount) AS amount
       FROM {{ ref('int__transactions') }}
+      WHERE error_text IS NULL
       GROUP BY transaction_month
    ) AS t ON t.transaction_month=m.month
 
@@ -66,6 +67,7 @@ FROM
          (
             SELECT customer_id, name, joined_date, transaction_month, SUM(amount) AS amount
             FROM {{ ref('int__transactions')  }}
+            WHERE error_text IS NULL
             GROUP BY customer_id, transaction_month, name, joined_date
          )
          ORDER BY transaction_month, amount DESC
